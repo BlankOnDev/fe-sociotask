@@ -25,7 +25,7 @@ export default function ReownProvider({ children, cookies }: { children: ReactNo
         if(theme === "light") {
             setThemeMode("light")
         }
-    }, [theme])
+    }, [theme, setThemeMode])
 
     return (
         <WagmiProvider config={wagmiAdapter.wagmiConfig as Config} initialState={initialState}>

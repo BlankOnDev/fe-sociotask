@@ -1,13 +1,49 @@
 {
     "common": {
         "connect-wallet": "Connect Wallet",
+        "sign-up": "Sign Up",
+        "sign-in": "Log In",
+        "logout": "Logout",
         "metadata": {
-            "title": "Socio Task | Earn Rewards from Your Social Activities",
+            "title": "Socio Task - Earn Rewards from Your Social Activities",
             "description": "Join Socio Task to monetize your social media engagement and earn rewards effortlessly."
-        }
+        },
+        "days-left": "{days, plural, =0 {no days left} =1 {one day left} other {# days left}}",
+        "hours-left": "{days, plural, =0 {no hours left} =1 {one hour left} other {# hours left}}"
     },
     "homepage": {
-        "title": "Welcome to Our Application",
-        "description": "This is the best place to manage your assets."
+        "hero": {
+            "announce":{
+                "info": "Info",
+                "text": "For now we can only handle coins on the Avalanche network"
+            },
+            "title": {
+                "earn": "Earn",
+                "rewards": "rewards",
+                "for-social-media-task": "for Social Media Tasks"
+            },
+            "desc": "Complete social media actions like follow, share, and comments or something else to earn cryptocurrency rewards.",
+            "cta": {
+                "browse-tasks": "Browse Tasks",
+                "join-us": "Join Us"
+            },
+            "coins-can-be-rewarded": "coins can be rewarded"
+        },
+        "how-to":{
+            "text": "How To",
+            "title": "Claim and earn cryptocurrency coins by completing tasks and getting confirmed",
+            "step-1": "Follow and complete the available tasks available in",
+            "step-2": "Complete the tasks according to the provisions",
+            "step-3": "Claim the cryptocurrency coins offered"
+        },
+        "ongoing-tasks": {
+            "text": "Ongoing Tasks",
+            "title": "Come on, find interesting tasks and complete them and get rewards.",
+            "more-tasks": "More Tasks"
+        },
+        "faq": {
+            "text": "FAQ",
+            "title": "Frequently asked questions"
+        }
     }
 }

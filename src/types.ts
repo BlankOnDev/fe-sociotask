@@ -1,0 +1,1 @@
+export type SocialPlatform = "instagram" | "x" | "facebook" | "youtube" | "threads" | "tiktok";

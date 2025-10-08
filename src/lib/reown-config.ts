@@ -1,4 +1,4 @@
-import { cookieStorage, createStorage, http } from "@wagmi/core";
+import { cookieStorage, createStorage } from "@wagmi/core";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { avalancheFuji } from "@reown/appkit/networks";
 import { createAppKit } from "@reown/appkit/react";
@@ -39,10 +39,13 @@ export const reownModal = createAppKit({
     networks: [avalancheFuji],
     defaultNetwork: avalancheFuji,
     metadata: metadata,
+    themeMode: "light",
     features: {
         analytics: true,
         email:false,
-        socials: false
+        socials: false,
+        onramp: false,
+        receive: true,
     },
     themeVariables: {
         "--w3m-font-family": "Inter, sans-serif",

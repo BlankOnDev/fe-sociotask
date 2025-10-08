@@ -1,13 +1,49 @@
 {
     "common": {
         "connect-wallet": "Hubungkan Wallet",
+        "sign-up": "Daftar",
+        "sign-in": "Masuk",
+        "logout": "Keluar",
         "metadata": {
-            "title": "Socio Task | Dapatkan Reward dari Aktivitas Sosial Anda",
+            "title": "Socio Task - Dapatkan Reward dari Aktivitas Sosial Anda",
             "description": "Bergabunglah dengan Socio Task untuk memonetisasi keterlibatan media sosial Anda dan dapatkan reward dengan mudah."
-        }
+        },
+        "days-left": "{days} hari tersisa",
+        "hours-left": "{days} jam tersisa"
     },
     "homepage": {
-        "title": "Selamat Datang di Aplikasi Kami",
-        "description": "Ini adalah tempat terbaik untuk mengelola aset Anda."
+        "hero": {
+            "announce": {
+                "info": "Info",
+                "text": "Saat ini hanya dapat menangani koin di jaringan Avalanche"
+            },
+            "title": {
+                "earn": "Dapatkan",
+                "rewards": "hadiah",
+                "for-social-media-task": "dari Media Sosial Anda"
+            },
+            "desc": "Lakukan berbagai aksi di media sosial, mulai dari follow, share, hingga komentar, dan dapatkan hadiah kripto.",
+            "cta": {
+                "browse-tasks": "Telusuri Task",
+                "join-us": "Bergabung"
+            },
+            "coins-can-be-rewarded": "koin yang dapat diklaim"
+        },
+        "how-to": {
+            "text": "Gimana Caranya",
+            "title": "Klaim dan dapatkan koin cryptocurrency dengan menyelesaikan tugas dan terkonfirmasi",
+            "step-1": "Ikuti dan selesaikan tugas yang tersedia di",
+            "step-2": "Selesaikan tugas sesuai dengan ketentuan",
+            "step-3": "Klaim koin cryptocurrency yang ditawarkan"
+        },
+        "ongoing-tasks": {
+            "text": "Sedang Berlangsung",
+            "title": "Ayo, temukan tugas menarik dan selesaikan untuk mendapatkan hadiah.",
+            "more-tasks": "Tasks Lainnya"
+        },
+        "faq": {
+            "text": "FAQ",
+            "title": "Pertanyaan yang sering diajukan"
+        }
     }
 }
