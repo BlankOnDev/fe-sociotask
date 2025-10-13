@@ -1,19 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence } from "motion/react"
-import {
-    Button,
-    ButtonProps,
-    Flex,
-    IconButton,
-    Image,
-} from "@chakra-ui/react";
+import { AnimatePresence } from "motion/react";
+import { Button, ButtonProps, Flex, IconButton, Image } from "@chakra-ui/react";
 import NextImage from "next/image";
 import ChooseLang from "./ChooseLang";
 import { useTranslations } from "next-intl";
 import { LuMenu, LuX } from "react-icons/lu";
 import { MotionBox, MotionFlex } from "../ui/ChakraMotion";
+import LoginDialog from "@/features/auth/components/LoginDialog";
 
 const btnLogInStaticProps: ButtonProps = {
     colorPalette: "pink",
@@ -32,11 +27,17 @@ const btnSignUpStaticProps: ButtonProps = {
 
 export default function HeaderNav() {
     const intl = useTranslations("common");
+    const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleLoginClick = () => {
+        setIsLoginDialogOpen(true);
+        setIsMenuOpen(false);
     };
 
     return (
@@ -64,7 +65,7 @@ export default function HeaderNav() {
             layout="size"
             animate={{ height: isMenuOpen ? "auto" : 0 }}
             transition={{
-                default: { duration: 0.2},
+                default: { duration: 0.2 },
                 height: { duration: 0.2, ease: "circInOut" },
             }}
         >
@@ -88,7 +89,9 @@ export default function HeaderNav() {
                 alignItems={"center"}
             >
                 <ChooseLang />
-                <Button {...btnLogInStaticProps}>{intl("sign-in")}</Button>
+                <Button {...btnLogInStaticProps} onClick={handleLoginClick}>
+                    {intl("sign-in")}
+                </Button>
                 <Button {...btnSignUpStaticProps}>{intl("sign-up")}</Button>
             </Flex>
             <IconButton
@@ -103,37 +106,43 @@ export default function HeaderNav() {
             </IconButton>
 
             <AnimatePresence>
-                {
-                    isMenuOpen && (
-                        <MotionBox
-                            display={{ base: "flex", sm: "none" }}
-                            mt={"8"}
+                {isMenuOpen && (
+                    <MotionBox
+                        display={{ base: "flex", sm: "none" }}
+                        mt={"8"}
+                        width={"100%"}
+                        key="header-nav-menu"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                        transition={{ duration: 0.25, delay: 0.2 }}
+                    >
+                        <Flex
                             width={"100%"}
-                            key="header-nav-menu"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0, transition: { duration: 0.15 } }}
-                            transition={{ duration: 0.25, delay: 0.2 }}
+                            flexDir={"column"}
+                            alignItems={"center"}
+                            gap={2}
                         >
-                            <Flex
-                                width={"100%"}
-                                flexDir={"column"}
-                                alignItems={"center"}
-                                gap={2}
-                            >
-                                <ChooseLang mb={1} />
-                                <Button width={"100%"} {...btnLogInStaticProps}>
-                                    {intl("sign-in")}
-                                </Button>
-                                <Button width={"100%"} {...btnSignUpStaticProps}>
-                                    {intl("sign-up")}
-                                </Button>
-                            </Flex>
-                        </MotionBox>
-                    )
-                }
-            </AnimatePresence>
+                            <ChooseLang mb={1} />
 
+                            <Button
+                                width={"full"}
+                                {...btnLogInStaticProps}
+                                onClick={handleLoginClick}
+                            >
+                                {intl("sign-in")}
+                            </Button>
+                            <Button width={"100%"} {...btnSignUpStaticProps}>
+                                {intl("sign-up")}
+                            </Button>
+                        </Flex>
+                    </MotionBox>
+                )}
+            </AnimatePresence>
+            <LoginDialog
+                open={isLoginDialogOpen}
+                onOpenChange={(details) => setIsLoginDialogOpen(details.open)}
+            />
         </MotionFlex>
     );
 }

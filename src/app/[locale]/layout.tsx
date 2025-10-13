@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata} from "next";
 import ReownProvider from "../provider/reown-provider";
 import { headers } from "next/headers";
 import "../globals.css";
