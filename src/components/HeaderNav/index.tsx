@@ -8,7 +8,7 @@ import ChooseLang from "./ChooseLang";
 import { useTranslations } from "next-intl";
 import { LuMenu, LuX } from "react-icons/lu";
 import { MotionBox, MotionFlex } from "../ui/ChakraMotion";
-import LoginDialog from "@/features/auth/components/LoginDialog";
+import AuthDialog from "@/features/auth/components/AuthDialog";
 
 const btnLogInStaticProps: ButtonProps = {
     colorPalette: "pink",
@@ -28,6 +28,7 @@ const btnSignUpStaticProps: ButtonProps = {
 export default function HeaderNav() {
     const intl = useTranslations("common");
     const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+    const [openedTab, setOpenedTab] = useState<"login" | "register">();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -36,6 +37,12 @@ export default function HeaderNav() {
     };
 
     const handleLoginClick = () => {
+        setOpenedTab("login");
+        setIsLoginDialogOpen(true);
+        setIsMenuOpen(false);
+    };
+    const handleSignUpClick = () => {
+        setOpenedTab("register");
         setIsLoginDialogOpen(true);
         setIsMenuOpen(false);
     };
@@ -92,7 +99,9 @@ export default function HeaderNav() {
                 <Button {...btnLogInStaticProps} onClick={handleLoginClick}>
                     {intl("sign-in")}
                 </Button>
-                <Button {...btnSignUpStaticProps}>{intl("sign-up")}</Button>
+                <Button {...btnSignUpStaticProps} onClick={handleSignUpClick}>
+                    {intl("sign-up")}
+                </Button>
             </Flex>
             <IconButton
                 p={0}
@@ -132,14 +141,19 @@ export default function HeaderNav() {
                             >
                                 {intl("sign-in")}
                             </Button>
-                            <Button width={"100%"} {...btnSignUpStaticProps}>
+                            <Button
+                                width={"100%"}
+                                {...btnSignUpStaticProps}
+                                onClick={handleSignUpClick}
+                            >
                                 {intl("sign-up")}
                             </Button>
                         </Flex>
                     </MotionBox>
                 )}
             </AnimatePresence>
-            <LoginDialog
+            <AuthDialog
+                tab={openedTab || "login"}
                 open={isLoginDialogOpen}
                 onOpenChange={(details) => setIsLoginDialogOpen(details.open)}
             />

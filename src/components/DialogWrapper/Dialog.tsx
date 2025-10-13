@@ -24,6 +24,7 @@ export default function DialogContainer(props: DialogProps) {
                         <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
                             <CloseButton
                                 bg={"white"}
+                                shadow={"md"}
                                 _hover={{ bg: "gray.100" }}
                                 size="sm"
                                 borderRadius={"lg"}
