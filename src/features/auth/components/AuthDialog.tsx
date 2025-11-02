@@ -1,9 +1,9 @@
 "use client";
 import DialogWrapper from "@/components/DialogWrapper";
-import { Button, Flex, Tabs } from "@chakra-ui/react";
 import ImageWrapper from "@/components/ui/image";
-import LoginContent from "./LoginContent";
+import { Flex, Tabs } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import LoginContent from "./LoginContent";
 import RegisterContent from "./RegisterContent";
 
 export default function AuthDialog({
@@ -79,6 +79,9 @@ export default function AuthDialog({
                     <Tabs.Content value="login">
                         <LoginContent
                             onSignUpClick={() => setTabActive("register")}
+                            onLoginSuccess={() =>
+                                onOpenChange?.({ open: false })
+                            }
                         />
                     </Tabs.Content>
                     <Tabs.Content value="register">

@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FaXTwitter } from "react-icons/fa6";
+import { useLogin } from "../hooks/useLogin";
 
 type InputValue = {
     email: string;
@@ -20,7 +21,8 @@ type InputValue = {
 
 type LoginContentProps = {
     onSignUpClick?: () => void;
-}
+    onLoginSuccess?: () => void;
+};
 
 export default function LoginContent(props: LoginContentProps) {
     const {
@@ -29,17 +31,21 @@ export default function LoginContent(props: LoginContentProps) {
         formState: { errors },
     } = useForm<InputValue>();
 
+    const { mutate: login, isPending } = useLogin({
+        mutationConfig:{
+            onSuccess: () =>{
+                props.onLoginSuccess?.();
+            }
+        }
+    });
+
     const onSubmit: SubmitHandler<InputValue> = (data) => {
-        console.log("Form submitted with data:", data);
+        login(data);
     };
 
     return (
         <>
-            <Heading
-                textAlign="center"
-                fontSize={"xl"}
-                fontWeight={"semibold"}
-            >
+            <Heading textAlign="center" fontSize={"xl"} fontWeight={"semibold"}>
                 Welcome Back...
             </Heading>
             <Text mt={1} textAlign="center" color={"gray.600"}>
@@ -50,6 +56,7 @@ export default function LoginContent(props: LoginContentProps) {
                     <Field.Root invalid={!!errors.email}>
                         <Field.Label>Email</Field.Label>
                         <Input
+                            disabled={isPending}
                             type="email"
                             rounded={"xl"}
                             placeholder="yourname@example.com"
@@ -62,16 +69,23 @@ export default function LoginContent(props: LoginContentProps) {
                     <Field.Root mt={3.5} invalid={!!errors.password}>
                         <Field.Label>Password</Field.Label>
                         <PasswordInput
+                            disabled={isPending}
                             type="password"
                             rounded={"xl"}
-                            placeholder="••••••••••"
                             {...register("password", { required: true })}
                         />
                         <Field.ErrorText>
                             Please enter your password
                         </Field.ErrorText>
                     </Field.Root>
-                    <Button type="submit" colorPalette={"pink"} mt={6} w="full">
+                    <Button
+                        loading={isPending}
+                        disabled={isPending}
+                        type="submit"
+                        colorPalette={"pink"}
+                        mt={6}
+                        w="full"
+                    >
                         Sign In
                     </Button>
                 </Box>
@@ -86,10 +100,20 @@ export default function LoginContent(props: LoginContentProps) {
                 Or sign in with
             </Text>
             <Flex gap={2} mx={"auto"} w="xs">
-                <Button variant="outline" flex={1} colorPalette={"gray"}>
+                <Button
+                    variant="outline"
+                    flex={1}
+                    colorPalette={"gray"}
+                    disabled={isPending}
+                >
                     <GoogleLogoColored />
                 </Button>
-                <Button flex={1} variant="outline" colorPalette={"gray"}>
+                <Button
+                    flex={1}
+                    variant="outline"
+                    colorPalette={"gray"}
+                    disabled={isPending}
+                >
                     <FaXTwitter size={22} />
                 </Button>
             </Flex>

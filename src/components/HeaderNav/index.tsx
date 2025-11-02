@@ -9,6 +9,8 @@ import { useTranslations } from "next-intl";
 import { LuMenu, LuX } from "react-icons/lu";
 import { MotionBox, MotionFlex } from "../ui/ChakraMotion";
 import AuthDialog from "@/features/auth/components/AuthDialog";
+import { useAtomValue } from "jotai";
+import { tokenStorageAtom } from "@/atom/auth";
 
 const btnLogInStaticProps: ButtonProps = {
     colorPalette: "pink",
@@ -31,6 +33,8 @@ export default function HeaderNav() {
     const [openedTab, setOpenedTab] = useState<"login" | "register">();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const accessToken = useAtomValue(tokenStorageAtom);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -96,12 +100,24 @@ export default function HeaderNav() {
                 alignItems={"center"}
             >
                 <ChooseLang />
-                <Button {...btnLogInStaticProps} onClick={handleLoginClick}>
-                    {intl("sign-in")}
-                </Button>
-                <Button {...btnSignUpStaticProps} onClick={handleSignUpClick}>
-                    {intl("sign-up")}
-                </Button>
+                {accessToken ? (
+                    <Button colorPalette={"pink"}>Browse</Button>
+                ) : (
+                    <>
+                        <Button
+                            {...btnLogInStaticProps}
+                            onClick={handleLoginClick}
+                        >
+                            {intl("sign-in")}
+                        </Button>
+                        <Button
+                            {...btnSignUpStaticProps}
+                            onClick={handleSignUpClick}
+                        >
+                            {intl("sign-up")}
+                        </Button>
+                    </>
+                )}
             </Flex>
             <IconButton
                 p={0}
@@ -134,20 +150,28 @@ export default function HeaderNav() {
                         >
                             <ChooseLang mb={1} />
 
-                            <Button
-                                width={"full"}
-                                {...btnLogInStaticProps}
-                                onClick={handleLoginClick}
-                            >
-                                {intl("sign-in")}
-                            </Button>
-                            <Button
-                                width={"100%"}
-                                {...btnSignUpStaticProps}
-                                onClick={handleSignUpClick}
-                            >
-                                {intl("sign-up")}
-                            </Button>
+                            {accessToken ? (
+                                <Button w={"full"} colorPalette={"pink"}>
+                                    Browse
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        {...btnLogInStaticProps}
+                                        w={"full"}
+                                        onClick={handleLoginClick}
+                                    >
+                                        {intl("sign-in")}
+                                    </Button>
+                                    <Button
+                                        w={"full"}
+                                        {...btnSignUpStaticProps}
+                                        onClick={handleSignUpClick}
+                                    >
+                                        {intl("sign-up")}
+                                    </Button>
+                                </>
+                            )}
                         </Flex>
                     </MotionBox>
                 )}

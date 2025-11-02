@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import HeaderNav from "@/components/HeaderNav";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/toaster"
 
 type Props = {
 	children: React.ReactNode;
@@ -82,6 +83,7 @@ export default async function RootLayout({ children, params }: Props) {
 								{children}
 							</main>
 							<Footer />
+							<Toaster />
 						</NextIntlClientProvider>
 					</ReownProvider>
 				</ChakraProviderWrapper>

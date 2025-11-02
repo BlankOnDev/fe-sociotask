@@ -1,5 +1,6 @@
 import { GoogleLogoColored } from "@/assets/icons/GoogleLogoColored";
 import { PasswordInput } from "@/components/ui/password-input";
+import { toaster } from "@/components/ui/toaster";
 import {
     Box,
     Button,
@@ -7,18 +8,25 @@ import {
     Flex,
     Heading,
     Input,
-    Text,
     Span,
     Tabs,
+    Text,
 } from "@chakra-ui/react";
+import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FaXTwitter } from "react-icons/fa6";
+import { login } from "../hooks/useLogin";
+import { useRegister } from "../hooks/useRegister";
+
+const accountAtom = atom<AccountValue>();
 
 type AccountValue = {
     email: string;
     password: string;
-    confirmPassword: string;
+    confirmPassword?: string;
 };
 
 type ProfileValue = {
@@ -54,23 +62,67 @@ export default function RegisterContent(props: RegisterContentProps) {
                 defaultValue={"account"}
             >
                 <Tabs.Content value="account">
-                    <AccountTab onSignInClick={props.onSignInClick} onSignUpClick={() => setTabActive("profile")} />
+                    <AccountTab
+                        onSignInClick={props.onSignInClick}
+                        onSignUpClick={() => setTabActive("profile")}
+                    />
                 </Tabs.Content>
                 <Tabs.Content value="profile">
-                    <ProfileTab onBackClick={() => setTabActive("account")} />
+                    <ProfileTab
+                        onBackClick={() => setTabActive("account")}
+                        onSignRegisterSuccess={props.onSignInClick}
+                    />
                 </Tabs.Content>
             </Tabs.Root>
         </>
     );
 }
 
-function AccountTab(props: { onSignInClick?: () => void, onSignUpClick?: () => void }) {
+function AccountTab(props: {
+    onSignInClick?: () => void;
+    onSignUpClick?: () => void;
+}) {
     const {
         register,
         handleSubmit,
         formState: { errors },
         setError,
     } = useForm<AccountValue>();
+    const setAccountAtom = useSetAtom(accountAtom);
+
+    const { mutate: checkLogin, isPending } = useMutation({
+        mutationFn: login,
+        onSuccess: () => {
+            setError("email", {
+                type: "manual",
+                message: "Email already exists. Please sign in.",
+            });
+        },
+        onError: (error, variables) => {
+            const axiosError = error as AxiosError;
+            if (axiosError.status === 404) {
+                setAccountAtom({
+                    email: variables.email,
+                    password: variables.password,
+                });
+                props.onSignUpClick?.();
+                return;
+            }
+            if (axiosError.status === 401) {
+                setError("email", {
+                    type: "manual",
+                    message: "Email already exists. Please sign in.",
+                });
+                return;
+            }
+            toaster.create({
+                type: "error",
+                title: "Something went wrong",
+                description: "An unexpected error occurred. Please try again.",
+            });
+        },
+    });
+
     const onSubmit: SubmitHandler<AccountValue> = (data) => {
         if (data.password !== data.confirmPassword) {
             setError("confirmPassword", {
@@ -79,8 +131,7 @@ function AccountTab(props: { onSignInClick?: () => void, onSignUpClick?: () => v
             });
             return;
         }
-        props.onSignUpClick?.();
-        console.log("Form submitted with data:", data);
+        checkLogin(data);
     };
     return (
         <>
@@ -89,21 +140,24 @@ function AccountTab(props: { onSignInClick?: () => void, onSignUpClick?: () => v
                     <Field.Root invalid={!!errors.email}>
                         <Field.Label>Email</Field.Label>
                         <Input
+                            disabled={isPending}
                             type="email"
                             rounded={"xl"}
                             placeholder="yourname@example.com"
                             {...register("email", { required: true })}
                         />
                         <Field.ErrorText>
-                            Please enter your email address
+                            {errors.email?.message ||
+                                (errors.email?.type === "required" &&
+                                    "Please enter your email address.")}
                         </Field.ErrorText>
                     </Field.Root>
                     <Field.Root mt={3.5} invalid={!!errors.password}>
                         <Field.Label>Password</Field.Label>
                         <PasswordInput
+                            disabled={isPending}
                             type="password"
                             rounded={"xl"}
-                            placeholder="••••••••••"
                             {...register("password", {
                                 required: true,
                                 minLength: 8,
@@ -119,9 +173,9 @@ function AccountTab(props: { onSignInClick?: () => void, onSignUpClick?: () => v
                     <Field.Root mt={3.5} invalid={!!errors.confirmPassword}>
                         <Field.Label>Confirm Password</Field.Label>
                         <PasswordInput
+                            disabled={isPending}
                             type="password"
                             rounded={"xl"}
-                            placeholder="••••••••••"
                             {...register("confirmPassword", {
                                 required: true,
                             })}
@@ -133,7 +187,13 @@ function AccountTab(props: { onSignInClick?: () => void, onSignUpClick?: () => v
                                 errors.confirmPassword.message}
                         </Field.ErrorText>
                     </Field.Root>
-                    <Button type="submit" colorPalette={"pink"} mt={6} w="full">
+                    <Button
+                        loading={isPending}
+                        type="submit"
+                        colorPalette={"pink"}
+                        mt={6}
+                        w="full"
+                    >
                         Sign Up
                     </Button>
                 </Box>
@@ -180,14 +240,31 @@ function AccountTab(props: { onSignInClick?: () => void, onSignUpClick?: () => v
     );
 }
 
-function ProfileTab(props: {onBackClick?: () => void}) {
+function ProfileTab(props: {
+    onBackClick?: () => void;
+    onSignRegisterSuccess?: () => void;
+}) {
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<ProfileValue>();
+    const accountData = useAtomValue(accountAtom);
+    const { mutate: registerMutate, isPending } = useRegister({
+        mutationConfig: {
+            onSuccess() {
+                props.onSignRegisterSuccess?.();
+            },
+        },
+    });
+
     const onSubmit: SubmitHandler<ProfileValue> = (data) => {
-        console.log("Form submitted with data:", data);
+        registerMutate({
+            fullname: data.fullName,
+            username: data.username,
+            email: accountData?.email || "",
+            password: accountData?.password || "",
+        });
     };
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -196,18 +273,27 @@ function ProfileTab(props: {onBackClick?: () => void}) {
                     <Field.Label>Full Name</Field.Label>{" "}
                     <Field.RequiredIndicator />
                     <Input
+                        disabled={isPending}
                         type="text"
                         rounded={"xl"}
                         placeholder="Gustavo Fring"
-                        {...register("fullName", { required: true })}
+                        {...register("fullName", {
+                            required: "Please enter your full name.",
+                            minLength: {
+                                value: 3,
+                                message:
+                                    "Full name must be at least 3 characters long.",
+                            },
+                        })}
                     />
                     <Field.ErrorText>
-                        Please enter your email address
+                        {errors.fullName?.message}
                     </Field.ErrorText>
                 </Field.Root>
                 <Field.Root mt={3.5} invalid={!!errors.username}>
-                    <Field.Label>username</Field.Label>
+                    <Field.Label>Username</Field.Label>
                     <Input
+                        disabled={isPending}
                         type="text"
                         rounded={"xl"}
                         placeholder="heisenberg"
@@ -215,26 +301,37 @@ function ProfileTab(props: {onBackClick?: () => void}) {
                             required: "Please enter your username",
                             pattern: {
                                 value: /^[a-zA-Z0-9_]+$/,
-                                message: "Username can only contain letters, numbers, and underscores"
+                                message:
+                                    "Username can only contain letters, numbers, and underscores",
                             },
                             minLength: {
                                 value: 3,
-                                message: "Username must be at least 3 characters long"
+                                message:
+                                    "Username must be at least 3 characters long",
                             },
                             maxLength: {
                                 value: 20,
-                                message: "Username must not exceed 20 characters"
-                            }
+                                message:
+                                    "Username must not exceed 20 characters",
+                            },
                         })}
                     />
                     <Field.ErrorText>
                         {errors.username?.message}
                     </Field.ErrorText>
                 </Field.Root>
-                <Button type="submit" colorPalette={"pink"} mt={6} w="full">
+                <Button
+                    disabled={isPending}
+                    loading={isPending}
+                    type="submit"
+                    colorPalette={"pink"}
+                    mt={6}
+                    w="full"
+                >
                     Create Account
                 </Button>
                 <Button
+                    disabled={isPending}
                     type="button"
                     colorPalette={"gray"}
                     mt={2}
