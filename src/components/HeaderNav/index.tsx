@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { authedUserAtom } from "@/atom/auth";
+import AuthDialog from "@/features/auth/components/AuthDialog";
+import {
+    Avatar,
+    Button,
+    ButtonProps,
+    Flex,
+    IconButton,
+    Image,
+} from "@chakra-ui/react";
+import { useAtomValue } from "jotai";
 import { AnimatePresence } from "motion/react";
-import { Button, ButtonProps, Flex, IconButton, Image } from "@chakra-ui/react";
-import NextImage from "next/image";
-import ChooseLang from "./ChooseLang";
 import { useTranslations } from "next-intl";
+import NextImage from "next/image";
+import { useState } from "react";
 import { LuMenu, LuX } from "react-icons/lu";
 import { MotionBox, MotionFlex } from "../ui/ChakraMotion";
-import AuthDialog from "@/features/auth/components/AuthDialog";
-import { useAtomValue } from "jotai";
-import { tokenStorageAtom } from "@/atom/auth";
+import ChooseLang from "./ChooseLang";
+import { UserMenu } from "./UserMenu";
+import { useAuthedUser } from "@/hooks/useAuthedUser";
 
 const btnLogInStaticProps: ButtonProps = {
     colorPalette: "pink",
@@ -34,7 +43,9 @@ export default function HeaderNav() {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const accessToken = useAtomValue(tokenStorageAtom);
+    const {} = useAuthedUser();
+
+    const authedUser = useAtomValue(authedUserAtom);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -94,18 +105,15 @@ export default function HeaderNav() {
                     height={0}
                 />
             </Image>
-            <Flex
-                display={{ base: "none", sm: "flex" }}
-                gap={2}
-                alignItems={"center"}
-            >
-                <ChooseLang />
-                {accessToken ? (
-                    <Button colorPalette={"pink"}>Browse</Button>
+            <ChooseLang ml={"auto"} />
+            <Flex gap={2} alignItems={"center"}>
+                {authedUser ? (
+                    <UserMenu />
                 ) : (
                     <>
                         <Button
                             {...btnLogInStaticProps}
+                            display={{ base: "none", sm: "flex" }}
                             onClick={handleLoginClick}
                         >
                             {intl("sign-in")}
@@ -113,6 +121,7 @@ export default function HeaderNav() {
                         <Button
                             {...btnSignUpStaticProps}
                             onClick={handleSignUpClick}
+                            display={{ base: "none", sm: "flex" }}
                         >
                             {intl("sign-up")}
                         </Button>
@@ -120,6 +129,7 @@ export default function HeaderNav() {
                 )}
             </Flex>
             <IconButton
+                hidden={!!authedUser}
                 p={0}
                 variant={"ghost"}
                 display={{ base: "flex", sm: "none" }}
@@ -148,12 +158,11 @@ export default function HeaderNav() {
                             alignItems={"center"}
                             gap={2}
                         >
-                            <ChooseLang mb={1} />
-
-                            {accessToken ? (
-                                <Button w={"full"} colorPalette={"pink"}>
-                                    Browse
-                                </Button>
+                            {authedUser ? (
+                                <Avatar.Root colorPalette="pink" size="sm">
+                                    <Avatar.Fallback name="Galang Arsandy" />
+                                    <Avatar.Image src="https://bit.ly/broken-link" />
+                                </Avatar.Root>
                             ) : (
                                 <>
                                     <Button

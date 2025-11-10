@@ -1,5 +1,8 @@
+import { getAuthedUser } from "@/hooks/useAuthedUser";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+
+type GetAuthedUser = Awaited<ReturnType<typeof getAuthedUser>>
 
 const tokenStorage =
     typeof window !== "undefined"
@@ -10,27 +13,4 @@ export const tokenStorageAtom = atomWithStorage<string | null>(
     tokenStorage
 );
 
-// export const userAuthedAtom = atom(
-//     async () => {
-//         try {
-//             const user = await getProfile();
-//             return {
-//                 payload: {
-//                     code: user.code,
-//                     name: user.name,
-//                     email: user.email,
-//                     profileImage: user.profileImage,
-//                     phone: user.phone,
-//                     roleName: user.roleName,
-//                 },
-//                 isAuthed: true,
-//             };
-//         } catch (err) {
-//             console.error({ authInvalid: err });
-//             return { isAuthed: false };
-//         }
-//     },
-//     (_, set, newAuth: AuthContextType) => {
-//         set(asyncAuthAtom, newAuth);
-//     }
-// );
+export const authedUserAtom = atom<GetAuthedUser>(null)

@@ -1,5 +1,6 @@
-import { tokenStorageAtom } from "@/atom/auth";
+import { authedUserAtom, tokenStorageAtom } from "@/atom/auth";
 import { toaster } from "@/components/ui/toaster";
+import { getAuthedUser } from "@/hooks/useAuthedUser";
 import { axiosInstance } from "@/lib/axios";
 import { MutationConfig } from "@/lib/react-query";
 import { useMutation } from "@tanstack/react-query";
@@ -34,6 +35,7 @@ type UseLoginParams = {
 
 export const useLogin = (params: UseLoginParams = {}) => {
     const setTokenStorage = useSetAtom(tokenStorageAtom);
+    const setAuthedUser = useSetAtom(authedUserAtom)
     const toasterId = "login-action";
     return useMutation({
         ...params.mutationConfig,
@@ -46,18 +48,30 @@ export const useLogin = (params: UseLoginParams = {}) => {
             });
         },
         onSuccess: (data, variables, onMutateResult, context) => {
-            toaster.update(toasterId, {
-                type: "success",
-                title: "Login Successful",
-                description: "You have been logged in successfully.",
-            });
             setTokenStorage(data.data.token);
-            params.mutationConfig?.onSuccess?.(
-                data,
-                variables,
-                onMutateResult,
-                context
-            );
+            getAuthedUser({ token: data.data.token })
+                .then((res) => {
+                    setAuthedUser(res)
+                    toaster.update(toasterId, {
+                        type: "success",
+                        title: "Login Successful",
+                        description: "You have been logged in successfully.",
+                    });
+                    params.mutationConfig?.onSuccess?.(
+                        data,
+                        variables,
+                        onMutateResult,
+                        context
+                    );
+                })
+                .catch((err) => {
+                    console.log({err});
+                    toaster.update(toasterId, {
+                        type: "error",
+                        title: "Login Failed",
+                        description: "Sorry we can't now process your loggin, please try again"
+                    })
+                })
         },
         onError(error, variables, onMutateResult, context) {
             const axiosError = error as AxiosError;
